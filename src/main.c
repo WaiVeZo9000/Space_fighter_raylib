@@ -50,6 +50,7 @@ int main(void){
     float last_spwan_time = 0.0f;  // To control the spawn rate
     float spawn_rate = 2.0f;
 
+    int score = 0;
 
     SetTargetFPS(60);
 
@@ -72,6 +73,7 @@ int main(void){
         if (player.x < 0) player.x = 0;
         if (player.x + player.width > GetScreenWidth()) player.x = screen_width - player.width;
         if (player.y < 0) player.y = 0;
+        if (player.y + player.height > GetScreenHeight()) player.y = screen_height - player.height;
 
         // Bullet Logic handle here
 
@@ -139,6 +141,35 @@ int main(void){
             }
         }
 
+        // Collisioin Logic
+
+        // Bullet - Enemy 
+        for (int i = 0; i < MAX_BULLETS ; i++){
+            if (bullets[i].active){
+                for (int j = 0 ; j < MAX_ENEMIES ; j++){
+                    if (enemies[j].active){
+                        if (CheckCollisionRecs(enemies[j].rec, bullets[i].rec)){
+                            bullets[i].active = false;
+                            enemies[j].active = false;
+                            score+=10;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Player - Enemy
+        for (int i = 0 ; i < MAX_ENEMIES ; i++){
+            if (enemies[i].active){
+                if (CheckCollisionRecs(player, enemies[i].rec)){
+                    enemies[i].active = false;
+                    score-=10;
+                    break;
+                }
+            }
+        }
+
         // Rendering part
         BeginDrawing();
 
@@ -159,6 +190,8 @@ int main(void){
                 DrawRectangleRec(enemies[i].rec, enemies[i].color);
             }
         }
+
+        DrawText(TextFormat("Score : %d ", score), 10, 10, 20, PINK);
 
         DrawText("This is a space fighter game", 200, 20, 20, BLUE);
         DrawFPS(screen_width - 100, 10);
