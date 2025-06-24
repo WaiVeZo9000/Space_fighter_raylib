@@ -1,4 +1,6 @@
 add_executable(Space_fighter
+    game.h
+    game.c 
     main.c
 )   
 
