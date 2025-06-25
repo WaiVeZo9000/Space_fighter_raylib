@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
 #include "game.h"
@@ -17,6 +18,14 @@ int main(void){
     ResetGame(screen_width, screen_height);
 
     Rectangle heart[player_lives];
+
+    // Background
+    Texture2D background = LoadTexture("assets/space_background.jpeg");
+
+    if (background.id == 0){
+        printf("Error in loading background.\n");
+        return 1;
+    }
 
     SetTargetFPS(60);
 
@@ -214,6 +223,17 @@ int main(void){
 
         ClearBackground(BLACK);
 
+        // Add the background
+        DrawTexturePro(background,
+                       (Rectangle){
+                           0, 0, background.width, background.height},
+                       (Rectangle){
+                           0, 0, GetScreenWidth(), GetScreenHeight()},
+                       (Vector2){
+                           0, 0},
+                       0,
+                       WHITE);
+
         switch (current_game_state)
         {
         case PLAYING:
@@ -265,6 +285,7 @@ int main(void){
         }
         EndDrawing();
     }
+    UnloadTexture(background);
 
     CloseWindow();
 }
