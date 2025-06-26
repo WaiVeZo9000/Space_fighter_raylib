@@ -18,10 +18,15 @@ float last_spawn_time;
 float spawn_rate;
 int score = 0;
 
+Texture2D player_texture = { 0 };
+Texture2D enemy_texture = { 0 };
+Texture2D bullet_texture = { 0 };
+Texture2D heart_texture = { 0 };
+
 void ResetGame(int screenWidth, int screenHeight)
 {
     // Reset Player
-    player = (Rectangle){ (float)screenWidth / 2 - 25, (float)screenHeight - 70, 50, 50 };
+    player = (Rectangle){ (float)screenWidth / 2 - 25, (float)screenHeight - 70, 90, 90 };
     player_speed = 5.0f;
     player_lives = 3;
 
@@ -41,4 +46,18 @@ void ResetGame(int screenWidth, int screenHeight)
     last_spawn_time = 0.0f;
     spawn_rate = 2.0f;
     score = 0;
+}
+
+void LoadGameAssets(void){
+    player_texture = LoadTexture("assets/spaceship.png");
+    enemy_texture = LoadTexture("assets/planets.png");
+    bullet_texture = LoadTexture("assets/space_bullets.png");
+    heart_texture = LoadTexture("assets/heart_pixels.png");
+}
+
+void UnloadGameAssets(void){
+    UnloadTexture(player_texture);
+    UnloadTexture(bullet_texture);
+    UnloadTexture(enemy_texture);
+    UnloadTexture(heart_texture);
 }

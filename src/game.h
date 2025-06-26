@@ -52,7 +52,17 @@ extern float spawn_rate;
 extern int score;
 extern Game_State current_game_state;
 
+// Game texture 
+extern Texture2D player_texture;
+extern Texture2D bullet_texture;
+extern Texture2D enemy_texture;
+extern Texture2D heart_texture;
+
 // Function declarations
-void ResetGame(int screenWidth, int screenHeight);
+extern void ResetGame(int screenWidth, int screenHeight);
+
+// Loading assets and unloading
+extern void LoadGameAssets(void);
+extern void UnloadGameAssets(void);
 
 #endif // GAME_HEADER

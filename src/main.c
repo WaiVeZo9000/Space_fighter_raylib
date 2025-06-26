@@ -15,6 +15,8 @@ int main(void){
 
     InitWindow(screen_width, screen_height, "Space fighter .");
 
+    LoadGameAssets();
+
     ResetGame(screen_width, screen_height);
 
     Rectangle heart[player_lives];
@@ -94,8 +96,8 @@ int main(void){
                     {
                         bullets[i].rec.x = player.x + player.width / 2 - 2; // center vertically
                         bullets[i].rec.y = player.y - 10;
-                        bullets[i].rec.width = 5;
-                        bullets[i].rec.height = 10;
+                        bullets[i].rec.width = 10;
+                        bullets[i].rec.height = 15;
                         bullets[i].speed = (Vector2){0, -bullet_speed}; // Move forward
                         bullets[i].active = true;
                         bullets[i].color = RED;
@@ -133,8 +135,8 @@ int main(void){
                     {
                         enemies[i].rec.x = (float)GetRandomValue(0, screen_width - 40); // Random X Position
                         enemies[i].rec.y = -40;                                         // Spawn above the screen
-                        enemies[i].rec.width = 40;
-                        enemies[i].rec.height = 40;
+                        enemies[i].rec.width = 100;
+                        enemies[i].rec.height = 100;
                         enemies[i].speed = (Vector2){0, enemy_speed};
                         enemies[i].active = true;
                         enemies[i].color = GREEN;
@@ -154,10 +156,6 @@ int main(void){
                     {
                         enemies[i].active = false;
                         player_lives--;
-                        if (player_lives <= 0)
-                        {
-                            current_game_state = GAME_OVER;
-                        }
                     }
                 }
             }
@@ -194,17 +192,17 @@ int main(void){
                     {
                         enemies[i].active = false;
                         player_lives--;
-                        if (player_lives <= 0)
-                        {
-                            current_game_state = GAME_OVER;
-                        }
                         break;
                     }
                 }
             }
 
+            if (player_lives <= 0)
+            {
+                current_game_state = GAME_OVER;
+            }
             break;
-        
+
         case GAME_OVER:
             if (IsKeyPressed(KEY_ENTER))
             {
@@ -239,14 +237,27 @@ int main(void){
         case PLAYING:
         case PAUSED:
             // Draw the player
-            DrawRectangleRec(player, RAYWHITE);
-
+            DrawTexturePro(player_texture,
+                           (Rectangle){0, 0, player_texture.width, player_texture.height},
+                           (Rectangle){
+                               player.x, player.y, player.width, player.height},
+                           (Vector2){
+                               0, 0},
+                           0.0f,
+                           WHITE);
             // Draw the bullets
             for (int i = 0; i < MAX_BULLETS; i++)
             {
                 if (bullets[i].active)
                 {
-                    DrawRectangleRec(bullets[i].rec, bullets[i].color);
+                    DrawTexturePro(bullet_texture,
+                                   (Rectangle){0, 0, bullet_texture.width, bullet_texture.height},
+                                   (Rectangle){
+                                       bullets[i].rec.x, bullets[i].rec.y, bullets[i].rec.width, bullets[i].rec.height},
+                                   (Vector2){
+                                       0, 0},
+                                   0.0f,
+                                   bullets[i].color);
                 }
             }
 
@@ -255,14 +266,32 @@ int main(void){
             {
                 if (enemies[i].active)
                 {
-                    DrawRectangleRec(enemies[i].rec, enemies[i].color);
+                    DrawTexturePro(enemy_texture,
+                                   (Rectangle){0, 0, enemy_texture.width, enemy_texture.height},
+                                   (Rectangle){
+                                       enemies[i].rec.x, enemies[i].rec.y, enemies[i].rec.width, enemies[i].rec.height},
+                                   (Vector2){
+                                       0, 0},
+                                   0.0f,
+                                   enemies[i].color);
                 }
             }
 
             // Draw Hearts
             for (int i = 0; i < player_lives; i++)
             {
-                DrawRectangleRec(heart[i], RED);
+                DrawTexturePro(heart_texture, 
+                    (Rectangle){
+                        0, 0, heart_texture.width, heart_texture.height
+                    },
+                    (Rectangle){
+                        heart[i].x, heart[i].y, heart[i].width, heart[i].height
+                    },
+                    (Vector2){
+                        0, 0
+                    },
+                    0.0f,
+                    RED);
             }
 
             DrawText(TextFormat("Score : %d ", score), 10, 10, 20, PINK);
@@ -286,6 +315,6 @@ int main(void){
         EndDrawing();
     }
     UnloadTexture(background);
-
+    UnloadGameAssets();
     CloseWindow();
 }
