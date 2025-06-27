@@ -22,6 +22,21 @@ typedef struct Bullet {
     Color color;    // Color of the bullet
 } Bullet;
 
+// Power up 
+typedef enum Boost {
+    SPEED_BOOST = 0,
+    BULLET_BOOST,
+} Boost;
+
+// Collectable boost
+typedef struct Collectable{
+    Rectangle rec;
+    Vector2 speed;
+    bool active;
+    Color color;
+    Boost buff;
+} Collectable;
+
 // Game state definition
 typedef enum Game_State {
     PLAYING = 0,
@@ -33,7 +48,7 @@ typedef enum Game_State {
 #define MAX_BULLETS 50
 #define MAX_ENEMIES 10
 #define MAX_LIVES 3  // Added constant for max lives
-
+#define MAX_POWERUP 5
 // Game state variables (extern declarations)
 extern Rectangle player; 
 extern int player_lives;  // Changed from array to counter
@@ -49,8 +64,13 @@ extern float enemy_speed;
 extern float last_spawn_time;  // Fixed typo
 extern float spawn_rate;
 
+extern Collectable collectable[MAX_POWERUP];
+extern float collectable_speed;
+extern float last_collect_time;
+extern float collect_rate;
+
 extern int score;
-extern Game_State current_game_state;
+extern enum Game_State current_game_state;
 
 // Game texture 
 extern Texture2D player_texture;

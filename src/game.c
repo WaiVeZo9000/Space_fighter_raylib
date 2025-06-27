@@ -1,5 +1,15 @@
 #include "game.h"
 
+Game_State current_game_state = PLAYING;
+
+// Boost init
+Boost game_boost;
+
+Collectable collectable[MAX_POWERUP];
+float collectable_speed;
+float last_collect_time;
+float collect_rate;
+
 // player variables
 Rectangle player;
 int player_lives = 3;  // Changed from array to counter
@@ -45,9 +55,19 @@ void ResetGame(int screenWidth, int screenHeight)
     enemy_speed = 2.0f;
     last_spawn_time = 0.0f;
     spawn_rate = 2.0f;
+    
+    // Reset Collectable
+    for (int i = 0 ; i < MAX_POWERUP ; i++){
+        collectable[i] = (Collectable){0};
+    }
+    collectable_speed = 4.0f;
+    collect_rate  = 5.0f;
+    last_collect_time = 0.0f;
+
     score = 0;
 }
 
+// Load the texture 
 void LoadGameAssets(void){
     player_texture = LoadTexture("assets/spaceship.png");
     enemy_texture = LoadTexture("assets/planets.png");
@@ -55,6 +75,7 @@ void LoadGameAssets(void){
     heart_texture = LoadTexture("assets/heart_pixels.png");
 }
 
+// unload the texture 
 void UnloadGameAssets(void){
     UnloadTexture(player_texture);
     UnloadTexture(bullet_texture);

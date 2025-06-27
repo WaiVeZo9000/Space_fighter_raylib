@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include "game.h"
 
-Game_State current_game_state = PLAYING;
-
 int main(void){
     // fresh the random number every time the game restart
     srand(time(NULL));
@@ -126,17 +124,18 @@ int main(void){
             }
             // Enemy Logic handle here
             // Spawn the enimes outside the screen
-            if (GetTime() - last_spawn_time >= spawn_rate)
+            if (GetTime() - last_spawn_time >= spawn_rate && spawn_rate > 0)
             {
                 // activate enemies
+                int size_of_enemy = (float)GetRandomValue(100, 200);  
                 for (int i = 0; i < MAX_ENEMIES; i++)
                 {
                     if (!enemies[i].active)
                     {
-                        enemies[i].rec.x = (float)GetRandomValue(0, screen_width - 40); // Random X Position
+                        enemies[i].rec.x = (float)GetRandomValue(0, screen_width - 50); // Random X Position
                         enemies[i].rec.y = -40;                                         // Spawn above the screen
-                        enemies[i].rec.width = 100;
-                        enemies[i].rec.height = 100;
+                        enemies[i].rec.width = size_of_enemy;
+                        enemies[i].rec.height = size_of_enemy;
                         enemies[i].speed = (Vector2){0, enemy_speed};
                         enemies[i].active = true;
                         enemies[i].color = GREEN;
@@ -151,7 +150,7 @@ int main(void){
             {
                 if (enemies[i].active)
                 {
-                    enemies[i].rec.y += enemies[i].speed.y;
+                    enemies[i].rec.y += enemies[i].speed.y ;
                     if (enemies[i].rec.y > screen_height)
                     {
                         enemies[i].active = false;
@@ -160,7 +159,56 @@ int main(void){
                 }
             }
 
+            // Collectable init
+            if (GetTime() - last_collect_time >= collect_rate){
+                for (int i = 0 ; i < MAX_POWERUP ; i++){
+                    if (!collectable[i].active){
+                        collectable[i].rec.x = (float)GetRandomValue(0, screen_width - 50);
+                        collectable[i].rec.y = -40;
+                        collectable[i].rec.width = 20;
+                        collectable[i].rec.height = 20;
+                        collectable[i].speed = (Vector2) { 0, collectable_speed};
+                        last_collect_time = GetTime();
+                        collectable[i].active = true;
+                        collectable[i].buff = GetRandomValue(0,1);
+                        collectable[i].color = BLUE;
+                        break;
+                    }
+                }
+            }
+
+            // Deactivate collectable 
+            for (int i = 0 ; i < MAX_POWERUP ; i++){
+                if (collectable[i].active){
+                    collectable[i].rec.y += collectable[i].speed.y;
+
+                    if (collectable[i].rec.y > screen_height){
+                        collectable[i].active = false;
+                    }
+                }
+            }
             // Collisioin Logic
+
+            // Power up
+            for (int i = 0 ; i < MAX_POWERUP ; i++){
+                if (collectable[i].active){
+                    if (CheckCollisionRecs(player, collectable[i].rec)){
+                        collectable[i].active = false;
+                        switch (collectable[i].buff)
+                        {
+                        case SPEED_BOOST:
+                            player_speed += 2.0f;
+                            break;
+                        
+                        case BULLET_BOOST:
+                            fire_rate -= 0.5f;                            
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+            }
 
             // Bullet - Enemy
             for (int i = 0; i < MAX_BULLETS; i++)
@@ -176,6 +224,9 @@ int main(void){
                                 bullets[i].active = false;
                                 enemies[j].active = false;
                                 score += 10;
+                                if (spawn_rate > 0){
+                                    spawn_rate -= 0.02f;
+                                }
                                 break;
                             }
                         }
@@ -261,6 +312,12 @@ int main(void){
                 }
             }
 
+            // Draw collectable buff
+            for (int i = 0 ; i < MAX_POWERUP ; i++){
+                if (collectable[i].active){
+                    DrawRectangleRec(collectable[i].rec, collectable[i].buff == 0 ? GREEN : RED );
+                }
+            }
             // Draw the enemies
             for (int i = 0; i < MAX_ENEMIES; i++)
             {
