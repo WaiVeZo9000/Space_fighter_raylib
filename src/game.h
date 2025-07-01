@@ -28,6 +28,15 @@ typedef enum Boost {
     BULLET_BOOST,
 } Boost;
 
+// Explosion definition
+typedef struct Explosion{
+    Rectangle rec;
+    bool active;
+    float frame_time;  // time passed since last frame
+    int current_frame;
+    float life_time; // how long this explosion will be active
+} Explosion;
+
 // Collectable boost
 typedef struct Collectable{
     Rectangle rec;
@@ -49,6 +58,13 @@ typedef enum Game_State {
 #define MAX_ENEMIES 10
 #define MAX_LIVES 3  // Added constant for max lives
 #define MAX_POWERUP 5
+#define MAX_EXPLOSIONS 8
+
+// Explosion animation constants
+#define EXPLOSION_FRAMES_PER_ROW 7 // the explosion sprite is 7 rows wide
+#define EXPLOSION_FRAME_COUNT 7
+#define EXPLOSION_FRAME_DURATION 0.08f // Time each frame stay visible
+
 // Game state variables (extern declarations)
 extern Rectangle player; 
 extern int player_lives;  // Changed from array to counter
@@ -69,14 +85,22 @@ extern float collectable_speed;
 extern float last_collect_time;
 extern float collect_rate;
 
+// explosion 
+extern Explosion explosions[MAX_EXPLOSIONS];
+
 extern int score;
 extern enum Game_State current_game_state;
+
+// Screen shake variables
+extern float screen_shake_intensity;
+extern Vector2 screen_shake_offset;
 
 // Game texture 
 extern Texture2D player_texture;
 extern Texture2D bullet_texture;
 extern Texture2D enemy_texture;
 extern Texture2D heart_texture;
+extern Texture2D explosion_texture;
 
 // Function declarations
 extern void ResetGame(int screenWidth, int screenHeight);

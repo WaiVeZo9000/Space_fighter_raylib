@@ -3,13 +3,14 @@
 #include <time.h>
 #include <stdlib.h>
 #include "game.h"
+#include <rlgl.h>
 
 int main(void){
     // fresh the random number every time the game restart
     srand(time(NULL));
 
-    int screen_width = 800;
-    int screen_height = 450;
+    int screen_width = 1200;
+    int screen_height = 650;
 
     InitWindow(screen_width, screen_height, "Space fighter .");
 
@@ -31,6 +32,9 @@ int main(void){
 
     while (!WindowShouldClose())
     {
+        // To get the each time frame
+        float delta_time = GetFrameTime();
+
         if (IsKeyPressed(KEY_Q))
         {
             if (current_game_state == PLAYING)
@@ -132,7 +136,7 @@ int main(void){
                 {
                     if (!enemies[i].active)
                     {
-                        enemies[i].rec.x = (float)GetRandomValue(0, screen_width - 50); // Random X Position
+                        enemies[i].rec.x = (float)GetRandomValue(0, screen_width - size_of_enemy); // Random X Position
                         enemies[i].rec.y = -40;                                         // Spawn above the screen
                         enemies[i].rec.width = size_of_enemy;
                         enemies[i].rec.height = size_of_enemy;
@@ -224,9 +228,22 @@ int main(void){
                                 bullets[i].active = false;
                                 enemies[j].active = false;
                                 score += 10;
+                                
+                                for (int k = 0 ; k < MAX_EXPLOSIONS ; k++){
+                                    if (!explosions[k].active){
+                                        explosions[k].rec = enemies[j].rec; 
+                                        explosions[k].active = true;
+                                        explosions[k].current_frame = 0;
+                                        explosions[k].frame_time = 0.0f;
+                                        explosions[k].life_time = 0.0f;
+                                        break;
+                                    }
+                                }
+
                                 if (spawn_rate > 0){
                                     spawn_rate -= 0.02f;
                                 }
+                                screen_shake_intensity = 5.0f;
                                 break;
                             }
                         }
@@ -243,6 +260,20 @@ int main(void){
                     {
                         enemies[i].active = false;
                         player_lives--;
+
+                        for (int k = 0; k < MAX_EXPLOSIONS; k++)
+                        {
+                            if (!explosions[k].active)
+                            {
+                                explosions[k].rec = enemies[i].rec;
+                                explosions[k].active = true;
+                                explosions[k].current_frame = 0;
+                                explosions[k].frame_time = 0.0f;
+                                explosions[k].life_time = 0.0f;
+                                break;
+                            }
+                        }
+                        screen_shake_intensity = 8.0f;
                         break;
                     }
                 }
@@ -252,6 +283,32 @@ int main(void){
             {
                 current_game_state = GAME_OVER;
             }
+            
+            for (int i = 0 ; i < MAX_EXPLOSIONS ; i++){
+                if (explosions[i].active){
+                    explosions[i].frame_time += delta_time; // Add the time passed since last frame
+                    if (explosions[i].frame_time >= EXPLOSION_FRAME_DURATION){
+                        explosions[i].current_frame++;
+                        explosions[i].frame_time = 0.0f;
+                        
+                        if (explosions[i].current_frame >= EXPLOSION_FRAME_COUNT){
+                            explosions[i].active = false;
+                        }
+                    }
+                }
+            }
+
+            // Screen shake
+            if (screen_shake_intensity > 0){
+
+                screen_shake_offset.x = GetRandomValue(-screen_shake_intensity, screen_shake_intensity);
+                screen_shake_offset.y = GetRandomValue(-screen_shake_intensity, screen_shake_intensity);
+                
+                screen_shake_intensity -= delta_time * 20.0f; // Decay over time
+                if (screen_shake_intensity < 0) screen_shake_intensity = 0;
+            }
+            else screen_shake_offset = (Vector2){ 0.0f, 0.0f };
+
             break;
 
         case GAME_OVER:
@@ -282,6 +339,10 @@ int main(void){
                            0, 0},
                        0,
                        WHITE);
+                        
+        // Push a translation matrix for screen shake
+        rlPushMatrix();
+        rlTranslatef(screen_shake_offset.x, screen_shake_offset.y , 0.0f);
 
         switch (current_game_state)
         {
@@ -334,6 +395,31 @@ int main(void){
                 }
             }
 
+            // Draw Explosions
+            for (int i = 0 ; i < MAX_EXPLOSIONS ; i++){
+                if (explosions[i].active){
+                    int frame_width = explosion_texture.width / EXPLOSION_FRAMES_PER_ROW;
+                    int frame_height = explosion_texture.height / (EXPLOSION_FRAME_COUNT / EXPLOSION_FRAMES_PER_ROW);
+                    int frame_col = explosions[i].current_frame % EXPLOSION_FRAMES_PER_ROW;
+                    int frame_row = explosions[i].current_frame / EXPLOSION_FRAMES_PER_ROW;
+
+                    Rectangle source_rec = {
+                        (float) frame_col * frame_width,
+                        (float) frame_row * frame_height,
+                        (float) frame_width,
+                        (float) frame_height
+                    };
+
+                    // Draw the current explosion frame
+                    DrawTexturePro(explosion_texture,
+                                   source_rec,
+                                   explosions[i].rec,
+                                   (Vector2){0, 0},
+                                   0.0f,
+                                   RAYWHITE);
+                }
+            }
+
             // Draw Hearts
             for (int i = 0; i < player_lives; i++)
             {
@@ -369,6 +455,8 @@ int main(void){
         default:
             break;
         }
+        rlPopMatrix();
+
         EndDrawing();
     }
     UnloadTexture(background);
