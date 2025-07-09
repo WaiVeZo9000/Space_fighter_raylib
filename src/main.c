@@ -169,8 +169,8 @@ int main(void){
                     if (!collectable[i].active){
                         collectable[i].rec.x = (float)GetRandomValue(0, screen_width - 50);
                         collectable[i].rec.y = -40;
-                        collectable[i].rec.width = 20;
-                        collectable[i].rec.height = 20;
+                        collectable[i].rec.width = 60;
+                        collectable[i].rec.height = 60;
                         collectable[i].speed = (Vector2) { 0, collectable_speed};
                         last_collect_time = GetTime();
                         collectable[i].active = true;
@@ -284,6 +284,7 @@ int main(void){
                 current_game_state = GAME_OVER;
             }
             
+            // Update the explosions
             for (int i = 0 ; i < MAX_EXPLOSIONS ; i++){
                 if (explosions[i].active){
                     explosions[i].frame_time += delta_time; // Add the time passed since last frame
@@ -376,7 +377,27 @@ int main(void){
             // Draw collectable buff
             for (int i = 0 ; i < MAX_POWERUP ; i++){
                 if (collectable[i].active){
-                    DrawRectangleRec(collectable[i].rec, collectable[i].buff == 0 ? GREEN : RED );
+                    switch (collectable[i].buff)
+                    {
+                        case SPEED_BOOST:
+                            DrawTexturePro(speed_boost_texture,
+                                           (Rectangle){0, 0, speed_boost_texture.width, speed_boost_texture.height},
+                                           (Rectangle){collectable[i].rec.x, collectable[i].rec.y, collectable[i].rec.width, collectable[i].rec.height},
+                                           (Vector2){0, 0},
+                                           0.0f,
+                                           WHITE);
+                            break;
+                        case BULLET_BOOST:
+                            DrawTexturePro(bullet_boost_texture,
+                                           (Rectangle){0, 0, bullet_boost_texture.width, bullet_boost_texture.height},
+                                           (Rectangle){collectable[i].rec.x, collectable[i].rec.y, collectable[i].rec.width, collectable[i].rec.height},
+                                           (Vector2){0, 0},
+                                           0.0f,
+                                           WHITE);
+                            break;
+                        default: 
+                            break;
+                    }
                 }
             }
             // Draw the enemies

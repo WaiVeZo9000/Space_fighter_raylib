@@ -101,6 +101,8 @@ extern Texture2D bullet_texture;
 extern Texture2D enemy_texture;
 extern Texture2D heart_texture;
 extern Texture2D explosion_texture;
+extern Texture2D speed_boost_texture;
+extern Texture2D bullet_boost_texture;
 
 // Function declarations
 extern void ResetGame(int screenWidth, int screenHeight);

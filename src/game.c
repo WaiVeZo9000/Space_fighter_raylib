@@ -38,6 +38,8 @@ Texture2D enemy_texture = { 0 };
 Texture2D bullet_texture = { 0 };
 Texture2D heart_texture = { 0 };
 Texture2D explosion_texture = { 0 };
+Texture2D speed_boost_texture = { 0 };
+Texture2D bullet_boost_texture = { 0 };
 
 void ResetGame(int screenWidth, int screenHeight)
 {
@@ -88,6 +90,8 @@ void LoadGameAssets(void){
     bullet_texture = LoadTexture("assets/space_bullets.png");
     heart_texture = LoadTexture("assets/heart_pixels.png");
     explosion_texture = LoadTexture("assets/explosion-animation.png");
+    speed_boost_texture = LoadTexture("assets/speed_boost.png");
+    bullet_boost_texture= LoadTexture("assets/bullet_boost.png");
 }
 
 // unload the texture 
@@ -97,4 +101,6 @@ void UnloadGameAssets(void){
     UnloadTexture(enemy_texture);
     UnloadTexture(heart_texture);
     UnloadTexture(explosion_texture);
+    UnloadTexture(speed_boost_texture);
+    UnloadTexture(bullet_boost_texture);
 }
