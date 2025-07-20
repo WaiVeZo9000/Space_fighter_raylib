@@ -1,6 +1,6 @@
 #include "game.h"
 
-Game_State current_game_state = PLAYING;
+Game_State current_game_state = MENU;
 
 // Boost init
 Boost game_boost;
@@ -41,7 +41,7 @@ Texture2D explosion_texture = { 0 };
 Texture2D speed_boost_texture = { 0 };
 Texture2D bullet_boost_texture = { 0 };
 
-void ResetGame(int screenWidth, int screenHeight)
+void InitGame(int screenWidth, int screenHeight)
 {
     // Reset Player
     player = (Rectangle){ (float)screenWidth / 2 - 25, (float)screenHeight - 70, 90, 90 };

@@ -48,7 +48,8 @@ typedef struct Collectable{
 
 // Game state definition
 typedef enum Game_State {
-    PLAYING = 0,
+    MENU = 0,
+    PLAYING,
     GAME_OVER,
     PAUSED
 } Game_State;
@@ -105,7 +106,7 @@ extern Texture2D speed_boost_texture;
 extern Texture2D bullet_boost_texture;
 
 // Function declarations
-extern void ResetGame(int screenWidth, int screenHeight);
+extern void InitGame(int screenWidth, int screenHeight);
 
 // Loading assets and unloading
 extern void LoadGameAssets(void);

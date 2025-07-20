@@ -16,8 +16,6 @@ int main(void){
 
     LoadGameAssets();
 
-    ResetGame(screen_width, screen_height);
-
     Rectangle heart[player_lives];
 
     // Background
@@ -49,6 +47,12 @@ int main(void){
 
         switch (current_game_state)
         {
+        case MENU:
+            if (IsKeyPressed(KEY_ENTER)){
+                InitGame(screen_width, screen_height);
+                current_game_state = PLAYING;
+            }
+            break;
         case PLAYING:
 
             // This is where we update the game logic
@@ -100,7 +104,7 @@ int main(void){
                         bullets[i].rec.y = player.y - 10;
                         bullets[i].rec.width = 10;
                         bullets[i].rec.height = 15;
-                        bullets[i].speed = (Vector2){0, -bullet_speed}; // Move forward
+                        bullets[i].speed = (Vector2){0, -bullet_speed}; // Move upward
                         bullets[i].active = true;
                         bullets[i].color = RED;
                         last_shot_time = GetTime();
@@ -316,7 +320,7 @@ int main(void){
             if (IsKeyPressed(KEY_ENTER))
             {
                 // Reset the game
-                ResetGame(screen_width, screen_height);
+                InitGame(screen_width, screen_height);
                 current_game_state = PLAYING;
             }
             break;
@@ -347,6 +351,11 @@ int main(void){
 
         switch (current_game_state)
         {
+        case MENU:
+            DrawText("SPACE FIGHTER", screen_width / 2 - MeasureText("SPACE FIGHTER", 60) / 2, screen_height / 4, 60, RAYWHITE);
+            DrawText("Press ENTER to Start", screen_width / 2 - MeasureText("Press ENTER to Start", 30) / 2, screen_height / 2, 30, GREEN);
+            DrawText("Press ESC to Exit", screen_width / 2 - MeasureText("Press ESC to Exit", 20) / 2, screen_height / 2 + 50, 20, GRAY);
+            break;
         case PLAYING:
         case PAUSED:
             // Draw the player
@@ -460,12 +469,11 @@ int main(void){
 
             DrawText(TextFormat("Score : %d ", score), 10, 10, 20, PINK);
 
-            DrawText("This is a space fighter game", 200, 20, 20, BLUE);
             DrawFPS(screen_width - 100, 10);
             if (current_game_state == PAUSED)
             {
                 DrawText("PAUSED", screen_width / 2 - MeasureText("PAUSED", 40) / 2, screen_height / 2 - 20, 40, YELLOW);
-                DrawText("Press Q to Resume", screen_width / 2 - MeasureText("Press ESC to Resume", 20) / 2, screen_height / 2 + 30, 20, RAYWHITE);
+                DrawText("Press Q to Resume", screen_width / 2 - MeasureText("Press Q to Resume", 20) / 2, screen_height / 2 + 30, 20, RAYWHITE);
             }
             break;
 
