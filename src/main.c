@@ -1,7 +1,3 @@
-#include <raylib.h>
-#include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
 #include "game.h"
 #include <rlgl.h>
 
@@ -22,7 +18,7 @@ int main(void){
     Texture2D background = LoadTexture("assets/space_background.jpeg");
 
     if (background.id == 0){
-        printf("Error in loading background.\n");
+        TraceLog(LOG_WARNING, "Background image not found.");
         return 1;
     }
 
@@ -45,16 +41,77 @@ int main(void){
             }
         }
 
+        if (current_game_state == PAUSED)
+        {
+            if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+            {
+                current_paused_menu--;
+                if (current_paused_menu > 0)
+                {
+                    current_paused_menu = MENU_COUNT - 1;
+                }
+            }
+
+            if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+            {
+                current_paused_menu++;
+                if (current_paused_menu > MENU_COUNT - 1)
+                {
+                    current_paused_menu = 0;
+                }
+            }
+
+            if (IsKeyPressed(KEY_ENTER))
+            {
+                switch (current_paused_menu)
+                {
+                case RESUME:
+                    current_game_state = PLAYING;
+                    break;
+
+                case EXIT:
+                    CloseWindow();
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
         switch (current_game_state)
         {
         case MENU:
+            if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+            {
+                current_game_menu--;
+                if (current_game_menu > 0){
+                    current_game_menu = OPTION_COUNT - 1;
+                }
+            }
+            
+            if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+            {
+                current_game_menu++;
+                if (current_game_menu > OPTION_COUNT - 1){
+                    current_game_menu = 0;
+                }
+            }
+
             if (IsKeyPressed(KEY_ENTER)){
-                InitGame(screen_width, screen_height);
-                current_game_state = PLAYING;
+                switch (current_game_menu)
+                {
+                case NEW_GAME:
+                    InitGame(screen_width, screen_height);
+                    current_game_state = PLAYING;
+                    break;
+                case EXIT_GAME:
+                    CloseWindow();
+                    break;
+                default:
+                    break;
+                }
             }
             break;
         case PLAYING:
-
             // This is where we update the game logic
             if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
             {
@@ -141,7 +198,7 @@ int main(void){
                     if (!enemies[i].active)
                     {
                         enemies[i].rec.x = (float)GetRandomValue(0, screen_width - size_of_enemy); // Random X Position
-                        enemies[i].rec.y = -40;                                         // Spawn above the screen
+                        enemies[i].rec.y = -size_of_enemy;                                         // Spawn above the screen
                         enemies[i].rec.width = size_of_enemy;
                         enemies[i].rec.height = size_of_enemy;
                         enemies[i].speed = (Vector2){0, enemy_speed};
@@ -172,7 +229,7 @@ int main(void){
                 for (int i = 0 ; i < MAX_POWERUP ; i++){
                     if (!collectable[i].active){
                         collectable[i].rec.x = (float)GetRandomValue(0, screen_width - 50);
-                        collectable[i].rec.y = -40;
+                        collectable[i].rec.y = -60;
                         collectable[i].rec.width = 60;
                         collectable[i].rec.height = 60;
                         collectable[i].speed = (Vector2) { 0, collectable_speed};
@@ -352,9 +409,15 @@ int main(void){
         switch (current_game_state)
         {
         case MENU:
+            
             DrawText("SPACE FIGHTER", screen_width / 2 - MeasureText("SPACE FIGHTER", 60) / 2, screen_height / 4, 60, RAYWHITE);
-            DrawText("Press ENTER to Start", screen_width / 2 - MeasureText("Press ENTER to Start", 30) / 2, screen_height / 2, 30, GREEN);
-            DrawText("Press ESC to Exit", screen_width / 2 - MeasureText("Press ESC to Exit", 20) / 2, screen_height / 2 + 50, 20, GRAY);
+            
+            Color game_hover_color = (current_game_menu == NEW_GAME) ? BLUE : RAYWHITE;
+            DrawText("New Game", screen_width / 2 - MeasureText("New Game", 50) / 2, screen_height / 2, 50, game_hover_color);
+            
+            Color exit_hover_color = (current_game_menu == EXIT_GAME) ? BLUE : RAYWHITE;
+            DrawText("Exit Game", screen_width / 2 - MeasureText("Exit Game", 30) / 2, screen_height / 2 + 60, 30, exit_hover_color);
+
             break;
         case PLAYING:
         case PAUSED:
@@ -472,8 +535,13 @@ int main(void){
             DrawFPS(screen_width - 100, 10);
             if (current_game_state == PAUSED)
             {
-                DrawText("PAUSED", screen_width / 2 - MeasureText("PAUSED", 40) / 2, screen_height / 2 - 20, 40, YELLOW);
-                DrawText("Press Q to Resume", screen_width / 2 - MeasureText("Press Q to Resume", 20) / 2, screen_height / 2 + 30, 20, RAYWHITE);
+                DrawText("PAUSED", screen_width / 2 - MeasureText("PAUSED", 40) / 2, screen_height / 2 - 50, 40, YELLOW);
+
+                Color game_hover_color = (current_paused_menu == RESUME) ? BLUE : RAYWHITE;
+                DrawText("Resume", screen_width / 2 - MeasureText("Resume", 30) / 2, screen_height / 2, 30, game_hover_color);
+
+                Color exit_hover_color = (current_paused_menu == EXIT) ? BLUE : RAYWHITE;
+                DrawText("Exit Game", screen_width / 2 - MeasureText("Exit Game", 20) / 2, screen_height / 2 + 60, 20, exit_hover_color);
             }
             break;
 

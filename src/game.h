@@ -54,6 +54,18 @@ typedef enum Game_State {
     PAUSED
 } Game_State;
 
+typedef enum Game_Menu {
+    NEW_GAME = 0,
+    EXIT_GAME,
+    OPTION_COUNT // Helper to count the menu types
+} Game_Menu;
+
+typedef enum Paused_Menu {
+    RESUME = 0,
+    EXIT,
+    MENU_COUNT 
+} Paused_Menu;
+
 // Constants
 #define MAX_BULLETS 50
 #define MAX_ENEMIES 10
@@ -91,6 +103,8 @@ extern Explosion explosions[MAX_EXPLOSIONS];
 
 extern int score;
 extern enum Game_State current_game_state;
+extern enum Game_Menu current_game_menu;
+extern enum Paused_Menu current_paused_menu;
 
 // Screen shake variables
 extern float screen_shake_intensity;

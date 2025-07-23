@@ -41,6 +41,9 @@ Texture2D explosion_texture = { 0 };
 Texture2D speed_boost_texture = { 0 };
 Texture2D bullet_boost_texture = { 0 };
 
+Game_Menu current_game_menu = NEW_GAME;
+Paused_Menu current_paused_menu = RESUME;
+
 void InitGame(int screenWidth, int screenHeight)
 {
     // Reset Player
